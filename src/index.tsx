@@ -1,12 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import { BrowserRouter } from 'react-router-dom';
+import { Grommet } from 'grommet';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { ApiContextProvider } from './context';
+
+const theme = {
+  global: {
+    font: {
+      family: 'Roboto',
+      size: '14px',
+      height: '20px',
+    },
+  },
+};
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <Grommet theme={theme}>
+        <ApiContextProvider>
+          <App />
+        </ApiContextProvider>
+      </Grommet>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
 );
