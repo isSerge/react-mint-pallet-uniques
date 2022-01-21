@@ -1,30 +1,45 @@
-import type { StorageKey } from '@polkadot/types';
-import type { AnyTuple, AnyJson, Codec } from '@polkadot/types/types';
 import { useEffect, useState } from 'react';
-import { Box, Heading, Form, FormField, TextInput, Button } from 'grommet';
+import { Box, Heading, Form, FormField, TextInput, Button, Select } from 'grommet';
+import type { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
+import type { StorageKey } from '@polkadot/types';
 import { useApi } from './context';
 
+function normalizeClass([key, value]: [StorageKey<AnyTuple>, Codec]) {
+  const id = parseInt((key.toHuman() as Array<string>)[0].replace(/,/g, ''), 10);
+  return { id, value: value.toJSON() }
+}
+
+function normalizeAsset([key, value]: [StorageKey<AnyTuple>, Codec]) {
+  const id = parseInt((key.toHuman() as Array<string>)[1], 10);
+  return { id, value: value.toJSON() }
+}
+
 function App() {
-  const [classes, setClasses] = useState<[StorageKey<AnyTuple>, Codec][]>([]);
-  const [assets, setAssets] = useState<[StorageKey<AnyTuple>, Codec][]>([]);
+  const [classes, setClasses] = useState<{ id: number, value: AnyJson }[]>([]);
+  const [assets, setAssets] = useState<{ id: number, value: AnyJson }[]>([]);
+  const [metadata, setMetadata] = useState<AnyJson | void>();
   const [selectedClass, selectClass] = useState<number | void>();
   const [selectedAsset, selectAsset] = useState<number | void>();
-  const [metadata, setMetadata] = useState<AnyJson | void>();
   const { api, isApiReady } = useApi();
   const [formValue, setFormValue] = useState({ classId: '', assetId: '', owner: '' });
+  const [selectValue, setSelectValue] = useState('Westmint');
+
+  console.log({ selectedAsset, selectedClass });
 
   useEffect(() => {
     if (isApiReady) {
-      api.query.uniques.class.entries().then(xs => {
-        setClasses(xs);
+      api.query.uniques.class.entries().then(data => {
+        const classes = data.map(normalizeClass)
+        setClasses(classes);
       })
     }
   }, [api, isApiReady]);
 
   useEffect(() => {
-    if (isApiReady) {
-      api.query.uniques.asset.entries(selectedClass).then(xs => {
-        setAssets(xs);
+    if (isApiReady && selectedClass !== undefined) {
+      api.query.uniques.asset.entries(selectedClass).then(data => {
+        const assets = data.map(normalizeAsset)
+        setAssets(assets);
       })
     }
   }, [api, isApiReady, selectedClass]);
@@ -55,17 +70,25 @@ function App() {
 
   return (
     <Box>
+      <Box width="200px">
+        <Select
+          options={['Statemint', 'Statemine', 'Westmint']}
+          value={selectValue}
+          onChange={({ option }) => setSelectValue(option)}
+        />
+      </Box>
       <Box>
         <Heading level="3">Classes</Heading>
         <Box>
-          {classes.map(([key, value]: any, i: number) => {
-            const id = parseInt(key.toHuman()[0].replace(/,/g, ''), 10);
+          {classes.map(({ id, value }: { id: number, value: AnyJson }) => {
             return (
               <Box
-                key={i}
+                key={id}
                 onClick={() => handleClassClick(id)}
+                border={selectedClass === id && 'all'}
+                pad="xxsmall"
               >
-                ID: {id} | owner: {value.toJSON().owner}
+                ID: {id} | owner: {(value as Record<string, string>).owner}
               </Box>
             )
           })}
@@ -74,14 +97,15 @@ function App() {
       <Box>
         <Heading level="3">Assets</Heading>
         <Box>
-          {assets.map(([key, value]: any, i: number) => {
-            const id = key.toHuman()[1];
+          {assets.map(({ id, value }: { id: number, value: AnyJson }) => {
             return (
               <Box
-                key={i}
+                key={id}
                 onClick={() => selectAsset(id)}
+                border={selectedAsset === id && 'all'}
+                pad="xxsmall"
               >
-                ID: {id} | owner: {value.toJSON().owner} | frozen: {value.toJSON().isFrozen ? 'yes' : 'no'}
+                ID: {id} | owner: {(value as Record<string, string>).owner}
               </Box>
             )
           })}
