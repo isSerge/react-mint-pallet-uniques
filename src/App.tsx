@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Box, Heading, Form, FormField, TextInput, Button, Select } from 'grommet';
+import { Box, Heading, Form, FormField, TextInput, Button, Select, Text } from 'grommet';
 import type { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
 import type { StorageKey } from '@polkadot/types';
+import { web3FromSource } from '@polkadot/extension-dapp';
 import { useApi } from './apiContext';
 import { useAccount } from './accountContext';
 
@@ -21,12 +22,10 @@ function App() {
   const [metadata, setMetadata] = useState<AnyJson | void>();
   const [selectedClass, selectClass] = useState<number | void>();
   const [selectedAsset, selectAsset] = useState<number | void>();
-  const [formValue, setFormValue] = useState({ classId: '', assetId: '', owner: '' });
+  const [formValue, setFormValue] = useState({ classId: '', assetId: '' });
   const [selectValue, setSelectValue] = useState('Westmint');
   const { api, isApiReady } = useApi();
   const { accounts, selectedAccount, selectAccount } = useAccount();
-
-  console.log({ selectedAsset, selectedClass, accounts, selectedAccount });
 
   useEffect(() => {
     if (isApiReady) {
@@ -60,11 +59,14 @@ function App() {
     selectClass(id)
   }
 
-  const mint = async ({ classId, assetId, owner }: any) => {
-    const unsub = await api.tx.uniques.mint(classId, assetId, owner).signAndSend(owner, { nonce: -1 }, async (result) => {
+  const mint = async ({ classId, assetId }: any) => {
+    const account = accounts.find(({ meta }: any) => meta.name === selectedAccount);
+    const extrinsic = api.tx.uniques.mint(classId, assetId, account.address);
+    const injector = await web3FromSource(account.meta.source);
+    const unsub = await extrinsic.signAndSend(account.address, { nonce: -1, signer: injector.signer }, async (result) => {
+      console.log(result.status.toHuman());
+
       if (result.status.isFinalized) {
-        console.log("Finalized");
-        console.log({ classId, assetId, owner })
         unsub();
       }
     })
@@ -77,14 +79,6 @@ function App() {
           options={['Statemint', 'Statemine', 'Westmint']}
           value={selectValue}
           onChange={({ option }) => setSelectValue(option)}
-        />
-      </Box>
-      <br />
-      <Box width="200px">
-        <Select
-          options={accounts.map(({ meta }: any) => meta.name)}
-          value={selectedAccount}
-          onChange={({ option }) => selectAccount(option)}
         />
       </Box>
       <Box>
@@ -129,20 +123,25 @@ function App() {
       </Box>
       <Box width={{ max: "300px" }}>
         <Heading level="3">Mint asset</Heading>
+        <Box width="400px" direction="row" gap="small" align="center" pad="small">
+          <Text>Account</Text>
+          <Select
+            options={accounts.map(({ meta }: any) => meta.name)}
+            value={selectedAccount}
+            onChange={({ option }) => selectAccount(option)}
+          />
+        </Box>
         <Form
           value={formValue}
           onChange={nextValue => setFormValue(nextValue)}
-          onReset={() => setFormValue({ classId: '', assetId: '', owner: '' })}
-          onSubmit={({ value }) => console.log(value)}
+          onReset={() => setFormValue({ classId: '', assetId: '' })}
+          onSubmit={({ value }) => mint(value)}
         >
           <FormField name="Class ID" htmlFor="text-input-id" label="Class ID">
             <TextInput name="classId" />
           </FormField>
           <FormField name="Asset ID" htmlFor="text-input-id" label="Asset ID">
             <TextInput name="assetId" />
-          </FormField>
-          <FormField name="Owner address" htmlFor="text-input-id" label="Owner address">
-            <TextInput name="owner" />
           </FormField>
           <Box direction="row" gap="medium">
             <Button type="submit" primary label="Submit" />
