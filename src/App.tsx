@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Box, Heading, Form, FormField, TextInput, Button, Select } from 'grommet';
 import type { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
 import type { StorageKey } from '@polkadot/types';
-import { useApi } from './context';
+import { useApi } from './apiContext';
+import { useAccount } from './accountContext';
 
 function normalizeClass([key, value]: [StorageKey<AnyTuple>, Codec]) {
   const id = parseInt((key.toHuman() as Array<string>)[0].replace(/,/g, ''), 10);
@@ -20,11 +21,12 @@ function App() {
   const [metadata, setMetadata] = useState<AnyJson | void>();
   const [selectedClass, selectClass] = useState<number | void>();
   const [selectedAsset, selectAsset] = useState<number | void>();
-  const { api, isApiReady } = useApi();
   const [formValue, setFormValue] = useState({ classId: '', assetId: '', owner: '' });
   const [selectValue, setSelectValue] = useState('Westmint');
+  const { api, isApiReady } = useApi();
+  const { accounts, selectedAccount, selectAccount } = useAccount();
 
-  console.log({ selectedAsset, selectedClass });
+  console.log({ selectedAsset, selectedClass, accounts, selectedAccount });
 
   useEffect(() => {
     if (isApiReady) {
@@ -75,6 +77,14 @@ function App() {
           options={['Statemint', 'Statemine', 'Westmint']}
           value={selectValue}
           onChange={({ option }) => setSelectValue(option)}
+        />
+      </Box>
+      <br />
+      <Box width="200px">
+        <Select
+          options={accounts.map(({ meta }: any) => meta.name)}
+          value={selectedAccount}
+          onChange={({ option }) => selectAccount(option)}
         />
       </Box>
       <Box>
