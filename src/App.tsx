@@ -5,6 +5,7 @@ import type { StorageKey } from '@polkadot/types';
 import { web3FromSource } from '@polkadot/extension-dapp';
 import { useApi } from './apiContext';
 import { useAccount } from './accountContext';
+import { sendAndFinalize } from './utils';
 
 function normalizeClass([key, value]: [StorageKey<AnyTuple>, Codec]) {
   const id = parseInt((key.toHuman() as Array<string>)[0].replace(/,/g, ''), 10);
@@ -14,6 +15,11 @@ function normalizeClass([key, value]: [StorageKey<AnyTuple>, Codec]) {
 function normalizeAsset([key, value]: [StorageKey<AnyTuple>, Codec]) {
   const id = parseInt((key.toHuman() as Array<string>)[1], 10);
   return { id, value: value.toJSON() }
+}
+
+type Minted = {
+  assetId: string;
+  classId: string;
 }
 
 function App() {
@@ -59,17 +65,12 @@ function App() {
     selectClass(id)
   }
 
-  const mint = async ({ classId, assetId }: any) => {
-    const account = accounts.find(({ meta }: any) => meta.name === selectedAccount);
-    const extrinsic = api.tx.uniques.mint(classId, assetId, account.address);
-    const injector = await web3FromSource(account.meta.source);
-    const unsub = await extrinsic.signAndSend(account.address, { nonce: -1, signer: injector.signer }, async (result) => {
-      console.log(result.status.toHuman());
-
-      if (result.status.isFinalized) {
-        unsub();
-      }
-    })
+  const mint = async ({ classId, assetId }: Minted) => {
+    const account = accounts.find(({ meta }) => meta.name === selectedAccount);
+    const extrinsic = api.tx.uniques.mint(classId, assetId, account!.address);
+    const injector = await web3FromSource(account!.meta.source);
+    const { block } = await sendAndFinalize(extrinsic, account!.address, api, injector.signer);
+    console.log("Block: ", block);
   }
 
   return (
@@ -126,7 +127,7 @@ function App() {
         <Box width="400px" direction="row" gap="small" align="center" pad="small">
           <Text>Account</Text>
           <Select
-            options={accounts.map(({ meta }: any) => meta.name)}
+            options={accounts.map(({ meta }) => (meta.name as string))}
             value={selectedAccount}
             onChange={({ option }) => selectAccount(option)}
           />

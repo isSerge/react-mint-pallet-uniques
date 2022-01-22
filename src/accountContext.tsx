@@ -1,12 +1,19 @@
-import React, { useContext, createContext, useEffect, useState } from 'react';
+import { useContext, createContext, useEffect, useState, Context, Dispatch, SetStateAction } from 'react';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
-const AccountContext: React.Context<any> =
+interface IAccountContext {
+  accounts: InjectedAccountWithMeta[],
+  selectedAccount: string;
+  selectAccount: Dispatch<SetStateAction<string>>;
+}
+
+const AccountContext: Context<IAccountContext> =
   createContext({
     accounts: [],
-    selectedAccount: ''
-  });
+    selectedAccount: '',
+    selectAccount: () => null,
+  } as IAccountContext);
 
 export function AccountContextProvider({ children }: any): React.ReactElement {
   const [accounts, setAccounts] = useState<InjectedAccountWithMeta[]>([]);
