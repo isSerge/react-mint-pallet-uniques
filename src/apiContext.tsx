@@ -2,6 +2,7 @@
 import { useContext, createContext, useEffect, useState } from 'react';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
+// import { useChain } from './chainContext'
 
 interface ApiPromiseContextType {
   api: ApiPromise;
@@ -23,9 +24,10 @@ const ApiPromiseContext: React.Context<ApiPromiseContextType> =
 export function ApiContextProvider(
   { children }: ApiContextProviderProps
 ): React.ReactElement {
-
+  // TODO: use context to switch between networks
+  // const { selectedChain } = useChain();
   const [apiPromise] = useState<ApiPromise>(
-    new ApiPromise({ provider: new WsProvider('wss://westmint-rpc.polkadot.io') })
+    new ApiPromise({ provider: new WsProvider('ws://127.0.0.1:9944') })
   );
 
   const [isReady, setIsReady] = useState(false);

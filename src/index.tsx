@@ -6,6 +6,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ApiContextProvider } from './apiContext';
 import { AccountContextProvider } from './accountContext';
+import { ChainContextProvider } from './chainContext';
 
 const theme = {
   global: {
@@ -21,11 +22,13 @@ ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Grommet theme={theme}>
-        <AccountContextProvider>
-          <ApiContextProvider>
-            <App />
-          </ApiContextProvider>
-        </AccountContextProvider>
+        <ChainContextProvider>
+          <AccountContextProvider>
+            <ApiContextProvider>
+              <App />
+            </ApiContextProvider>
+          </AccountContextProvider>
+        </ChainContextProvider>
       </Grommet>
     </BrowserRouter>
   </React.StrictMode>,
