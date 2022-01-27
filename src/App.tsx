@@ -18,7 +18,7 @@ function normalizeAsset([key, value]: [StorageKey<AnyTuple>, Codec]) {
   return { id, value: value.toJSON() }
 }
 
-type Minted = {
+type DefaultState = {
   assetId: string;
   classId: string;
 }
@@ -43,9 +43,10 @@ function App() {
   const [selectedClass, selectClass] = useState<number | void>();
   const [selectedAsset, selectAsset] = useState<number | void>();
   const [classFormValue, setClassFormValue] = useState({ classId: '' });
-  const [mintFormValue, setMintFormValue] = useState({ classId: '', assetId: '' });
+  const [mintFormValue, setMintFormValue] = useState<DefaultState>({ classId: '', assetId: '' });
   const [metadataFormValue, setMetadataFormValue] = useState<MetadataState>({ classId: '', assetId: '', metadata: '', isFrozen: false });
   const [transferFormValue, setTransferFormValue] = useState<TransferState>({ classId: '', assetId: '', destination: '' });
+  const [burnFormValue, setBurnFormValue] = useState<DefaultState>({ classId: '', assetId: '' });
 
   const { api, isApiReady } = useApi();
   const { accounts, selectedAccount, selectAccount } = useAccount();
@@ -83,7 +84,7 @@ function App() {
     selectClass(id)
   }
 
-  const mint = async ({ classId, assetId }: Minted) => {
+  const mint = async ({ classId, assetId }: DefaultState) => {
     const account = accounts.find(({ meta }) => meta.name === selectedAccount);
 
     if (account) {
@@ -121,6 +122,17 @@ function App() {
 
     if (account) {
       const extrinsic = api.tx.uniques.transfer(parseInt(classId, 10), parseInt(assetId, 10), destination);
+      const injector = await web3FromSource(account.meta.source);
+      const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
+      console.log("Block: ", block);
+    }
+  }
+
+  const burn = async ({ classId, assetId }: DefaultState) => {
+    const account = accounts.find(({ meta }) => meta.name === selectedAccount);
+
+    if (account) {
+      const extrinsic = api.tx.uniques.burn(parseInt(classId, 10), parseInt(assetId, 10), null);
       const injector = await web3FromSource(account.meta.source);
       const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
       console.log("Block: ", block);
@@ -266,6 +278,26 @@ function App() {
           </FormField>
           <FormField name="Destination address" htmlFor="text-input-id" label="Destination address">
             <TextInput name="destination" />
+          </FormField>
+          <Box direction="row" gap="medium">
+            <Button type="submit" primary label="Submit" />
+            <Button type="reset" label="Reset" />
+          </Box>
+        </Form>
+      </Box>
+      <Box width={{ max: "300px" }}>
+        <Heading level="3">4. Burn asset</Heading>
+        <Form
+          value={burnFormValue}
+          onChange={nextValue => setBurnFormValue(nextValue)}
+          onReset={() => setBurnFormValue({ classId: '', assetId: '' })}
+          onSubmit={({ value }) => burn(value)}
+        >
+          <FormField name="Class ID" htmlFor="text-input-id" label="Class ID">
+            <TextInput name="classId" />
+          </FormField>
+          <FormField name="Asset ID" htmlFor="text-input-id" label="Asset ID">
+            <TextInput name="assetId" />
           </FormField>
           <Box direction="row" gap="medium">
             <Button type="submit" primary label="Submit" />
