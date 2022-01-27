@@ -30,6 +30,12 @@ type MetadataState = {
   isFrozen: boolean;
 }
 
+type TransferState = {
+  assetId: string;
+  classId: string;
+  destination: string;
+}
+
 function App() {
   const [classes, setClasses] = useState<{ id: number, value: AnyJson }[]>([]);
   const [assets, setAssets] = useState<{ id: number, value: AnyJson }[]>([]);
@@ -39,6 +45,8 @@ function App() {
   const [classFormValue, setClassFormValue] = useState({ classId: '' });
   const [mintFormValue, setMintFormValue] = useState({ classId: '', assetId: '' });
   const [metadataFormValue, setMetadataFormValue] = useState<MetadataState>({ classId: '', assetId: '', metadata: '', isFrozen: false });
+  const [transferFormValue, setTransferFormValue] = useState<TransferState>({ classId: '', assetId: '', destination: '' });
+
   const { api, isApiReady } = useApi();
   const { accounts, selectedAccount, selectAccount } = useAccount();
   const { selectedChain, chains } = useChain();
@@ -102,6 +110,17 @@ function App() {
 
     if (account) {
       const extrinsic = api.tx.uniques.setMetadata(parseInt(classId, 10), parseInt(assetId, 10), metadata, isFrozen);
+      const injector = await web3FromSource(account.meta.source);
+      const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
+      console.log("Block: ", block);
+    }
+  }
+
+  const transer = async ({ classId, assetId, destination }: TransferState) => {
+    const account = accounts.find(({ meta }) => meta.name === selectedAccount);
+
+    if (account) {
+      const extrinsic = api.tx.uniques.transfer(parseInt(classId, 10), parseInt(assetId, 10), destination);
       const injector = await web3FromSource(account.meta.source);
       const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
       console.log("Block: ", block);
@@ -224,6 +243,29 @@ function App() {
           </FormField>
           <FormField name="Freeze" htmlFor="text-input-id">
             <CheckBox name="isFrozen" label="Freeze" />
+          </FormField>
+          <Box direction="row" gap="medium">
+            <Button type="submit" primary label="Submit" />
+            <Button type="reset" label="Reset" />
+          </Box>
+        </Form>
+      </Box>
+      <Box width={{ max: "300px" }}>
+        <Heading level="3">4. Transfer asset</Heading>
+        <Form
+          value={transferFormValue}
+          onChange={nextValue => setTransferFormValue(nextValue)}
+          onReset={() => setTransferFormValue({ classId: '', assetId: '', destination: '' })}
+          onSubmit={({ value }) => transer(value)}
+        >
+          <FormField name="Class ID" htmlFor="text-input-id" label="Class ID">
+            <TextInput name="classId" />
+          </FormField>
+          <FormField name="Asset ID" htmlFor="text-input-id" label="Asset ID">
+            <TextInput name="assetId" />
+          </FormField>
+          <FormField name="Destination address" htmlFor="text-input-id" label="Destination address">
+            <TextInput name="destination" />
           </FormField>
           <Box direction="row" gap="medium">
             <Button type="submit" primary label="Submit" />
