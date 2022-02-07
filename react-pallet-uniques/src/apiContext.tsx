@@ -26,8 +26,10 @@ export function ApiContextProvider(
 ): React.ReactElement {
   // TODO: use context to switch between networks
   // const { selectedChain } = useChain();
+  // wss://westmint-rpc.polkadot.io westmint
+  // ws://127.0.0.1:9944 local
   const [apiPromise] = useState<ApiPromise>(
-    new ApiPromise({ provider: new WsProvider('ws://127.0.0.1:9944') })
+    new ApiPromise({ provider: new WsProvider('wss://westmint-rpc.polkadot.io') })
   );
 
   const [isReady, setIsReady] = useState(false);

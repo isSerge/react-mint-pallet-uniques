@@ -13,13 +13,14 @@ interface IChainContext {
 
 const defaultChains: Chain[] = [
   {
-    url: 'ws://127.0.0.1:9944',
-    name: 'local'
-  },
-  {
     url: 'wss://westmint-rpc.polkadot.io',
     name: 'Westmint'
   },
+  {
+    url: 'ws://127.0.0.1:9944',
+    name: 'local'
+  },
+  
   {
     url: 'wss://statemine-rpc.polkadot.io',
     name: 'Statemine'
