@@ -4,8 +4,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { Grommet } from 'grommet';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { ApiContextProvider } from './apiContext';
-import { AccountContextProvider } from './accountContext';
+import { ApiProvider } from './apiContext';
+import { AccountProvider } from './accountContext';
+import { SubspaceProvider } from './subspaceContext';
 
 const theme = {
   global: {
@@ -21,11 +22,13 @@ ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Grommet theme={theme}>
-        <AccountContextProvider>
-          <ApiContextProvider>
-            <App />
-          </ApiContextProvider>
-        </AccountContextProvider>
+        <AccountProvider>
+          <ApiProvider>
+            <SubspaceProvider>
+              <App />
+            </SubspaceProvider>
+          </ApiProvider>
+        </AccountProvider>
       </Grommet>
     </BrowserRouter>
   </React.StrictMode>,

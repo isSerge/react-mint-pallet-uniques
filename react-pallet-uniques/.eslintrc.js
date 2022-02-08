@@ -1,4 +1,4 @@
-{
+module.exports = {
   "root": true,
   "env": {
     "es2021": true,
@@ -20,9 +20,9 @@
         "*.tsx"
       ],
       "parserOptions": {
-        "project": [
-          "tsconfig.json"
-        ]
+        project: "tsconfig.json",
+        tsconfigRootDir: __dirname,
+        sourceType: "module",
       }
     }
   ],

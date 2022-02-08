@@ -22,7 +22,7 @@ interface ApiContextProviderProps
 const ApiPromiseContext: React.Context<ApiPromiseContextType> =
   createContext({} as ApiPromiseContextType);
 
-export function ApiContextProvider(
+export function ApiProvider(
   { children }: ApiContextProviderProps
 ): React.ReactElement {
   const [apiPromise, setApiPromise] = useState<ApiPromise>();

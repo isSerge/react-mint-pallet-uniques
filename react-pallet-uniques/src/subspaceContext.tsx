@@ -9,12 +9,8 @@ interface SubspaceContextType {
   chainName?: string;
 }
 
-interface ApiRxContextProviderProps {
+interface ContextProviderProps {
   children?: React.ReactElement;
-}
-
-interface SubspaceProviderProps
-  extends ApiRxContextProviderProps {
 }
 
 const SubspaceContext: React.Context<SubspaceContextType> =
@@ -33,7 +29,7 @@ const getSubspaceApi = async (nodeUrl: string, farmerUrl: string) => {
 }
 
 export function SubspaceProvider(
-  { children }: SubspaceProviderProps
+  { children }: ContextProviderProps
 ): React.ReactElement {
   const [apiSubspace, setApiSubspace] = useState<SubspaceClient>();
 
