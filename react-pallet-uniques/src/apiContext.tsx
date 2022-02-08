@@ -4,9 +4,11 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
 // import { useChain } from './chainContext'
 
+const parsedQuery = new URLSearchParams(window.location.search);
+const connectedSocket = parsedQuery.get('rpc') || 'ws://127.0.0.1:9944';
+
 interface ApiPromiseContextType {
-  api: ApiPromise;
-  isApiReady: boolean;
+  api?: ApiPromise;
 }
 
 interface ApiRxContextProviderProps {
@@ -28,23 +30,24 @@ export function ApiContextProvider(
   // const { selectedChain } = useChain();
   // wss://westmint-rpc.polkadot.io westmint
   // ws://127.0.0.1:9944 local
-  const [apiPromise] = useState<ApiPromise>(
-    new ApiPromise({ provider: new WsProvider('wss://westmint-rpc.polkadot.io') })
-  );
-
-  const [isReady, setIsReady] = useState(false);
+  const [apiPromise, setApiPromise] = useState<ApiPromise>();
 
   useEffect(() => {
-    apiPromise.isReady
-      .then(() => {
-        setIsReady(true);
-      })
+    if (apiPromise) return;
+
+    console.log(`Connecting to: ${connectedSocket}`)
+
+    const provider = new WsProvider(connectedSocket);
+    const api = new ApiPromise({ provider });
+
+    api.isReady
+      .then(() => setApiPromise(api))
       .catch((e) => console.error(e));
-  }, [apiPromise.isReady]);
+  }, [apiPromise]);
 
   return (
     <ApiPromiseContext.Provider
-      value={{ api: apiPromise, isApiReady: isReady }}
+      value={{ api: apiPromise }}
     >
       {children}
     </ApiPromiseContext.Provider>

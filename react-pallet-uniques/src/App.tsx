@@ -48,35 +48,35 @@ function App() {
   const [transferFormValue, setTransferFormValue] = useState<TransferState>({ classId: '', assetId: '', destination: '' });
   const [burnFormValue, setBurnFormValue] = useState<DefaultState>({ classId: '', assetId: '' });
 
-  const { api, isApiReady } = useApi();
+  const { api } = useApi();
   const { accounts, selectedAccount, selectAccount } = useAccount();
   const { selectedChain, chains } = useChain();
 
   useEffect(() => {
-    if (isApiReady) {
+    if (api) {
       api.query.uniques.class.entries().then(data => {
         const classes = data.map(normalizeClass)
         setClasses(classes);
       })
     }
-  }, [api, isApiReady]);
+  }, [api]);
 
   useEffect(() => {
-    if (isApiReady && selectedClass !== undefined) {
+    if (selectedClass !== undefined && api) {
       api.query.uniques.asset.entries(selectedClass).then(data => {
         const assets = data.map(normalizeAsset);
         setAssets(assets);
       })
     }
-  }, [api, isApiReady, selectedClass]);
+  }, [api, selectedClass]);
 
   useEffect(() => {
-    if (isApiReady && selectedAsset) {
+    if (selectedAsset && api) {
       api.query.uniques.instanceMetadataOf(selectedClass, selectedAsset).then(metadata => {
         setMetadata(metadata.toHuman());
       })
     }
-  }, [api, isApiReady, selectedAsset]);
+  }, [api, selectedAsset]);
 
   const handleClassClick = (id: number) => {
     selectAsset();
@@ -87,7 +87,7 @@ function App() {
   const mint = async ({ classId, assetId }: DefaultState) => {
     const account = accounts.find(({ meta }) => meta.name === selectedAccount);
 
-    if (account) {
+    if (account && api) {
       const extrinsic = api.tx.uniques.mint(parseInt(classId, 10), parseInt(assetId, 10), account.address);
       const injector = await web3FromSource(account.meta.source);
       const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
@@ -98,7 +98,7 @@ function App() {
   const createClass = async (classId: string) => {
     const account = accounts.find(({ meta }) => meta.name === selectedAccount);
 
-    if (account) {
+    if (account && api) {
       const extrinsic = api.tx.uniques.create(parseInt(classId, 10), account.address);
       const injector = await web3FromSource(account.meta.source);
       const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
@@ -109,7 +109,7 @@ function App() {
   const setAssetMetadata = async ({ classId, assetId, metadata, isFrozen }: MetadataState) => {
     const account = accounts.find(({ meta }) => meta.name === selectedAccount);
 
-    if (account) {
+    if (account && api) {
       const extrinsic = api.tx.uniques.setMetadata(parseInt(classId, 10), parseInt(assetId, 10), metadata, isFrozen);
       const injector = await web3FromSource(account.meta.source);
       const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
@@ -120,7 +120,7 @@ function App() {
   const transer = async ({ classId, assetId, destination }: TransferState) => {
     const account = accounts.find(({ meta }) => meta.name === selectedAccount);
 
-    if (account) {
+    if (account && api) {
       const extrinsic = api.tx.uniques.transfer(parseInt(classId, 10), parseInt(assetId, 10), destination);
       const injector = await web3FromSource(account.meta.source);
       const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
@@ -131,7 +131,7 @@ function App() {
   const burn = async ({ classId, assetId }: DefaultState) => {
     const account = accounts.find(({ meta }) => meta.name === selectedAccount);
 
-    if (account) {
+    if (account && api) {
       const extrinsic = api.tx.uniques.burn(parseInt(classId, 10), parseInt(assetId, 10), null);
       const injector = await web3FromSource(account.meta.source);
       const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
