@@ -1,22 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Box, Heading, Form, FormField, TextInput, Button, Select, Text, CheckBox } from 'grommet';
-import type { AnyJson, AnyTuple, Codec } from '@polkadot/types/types';
-import type { StorageKey } from '@polkadot/types';
+import type { AnyJson } from '@polkadot/types/types';
 import { web3FromSource } from '@polkadot/extension-dapp';
 import { useApi } from './apiContext';
 import { useAccount } from './accountContext';
-import { useChain } from './chainContext';
-import { sendAndFinalize } from './utils';
-
-function normalizeClass([key, value]: [StorageKey<AnyTuple>, Codec]) {
-  const id = parseInt((key.toHuman() as Array<string>)[0].replace(/,/g, ''), 10);
-  return { id, value: value.toJSON() }
-}
-
-function normalizeAsset([key, value]: [StorageKey<AnyTuple>, Codec]) {
-  const id = parseInt((key.toHuman() as Array<string>)[1], 10);
-  return { id, value: value.toJSON() }
-}
+import { sendAndFinalize, normalizeClass, normalizeAsset } from './utils';
 
 type DefaultState = {
   assetId: string;
@@ -48,9 +36,8 @@ function App() {
   const [transferFormValue, setTransferFormValue] = useState<TransferState>({ classId: '', assetId: '', destination: '' });
   const [burnFormValue, setBurnFormValue] = useState<DefaultState>({ classId: '', assetId: '' });
 
-  const { api } = useApi();
+  const { api, chainName } = useApi();
   const { accounts, selectedAccount, selectAccount } = useAccount();
-  const { selectedChain, chains } = useChain();
 
   useEffect(() => {
     if (api) {
@@ -142,13 +129,7 @@ function App() {
   return (
     <Box>
       <Box width="200px">
-        <Text>Chain</Text>
-        <Select
-          options={chains.map(({ name }) => name)}
-          value={selectedChain.name}
-          // onChange={({ option }) => handleChainSelect(option)}
-          disabled
-        />
+        <Text>Chain: {chainName}</Text>
       </Box>
       <br />
       <Box width="200px" gap="xxsmall">

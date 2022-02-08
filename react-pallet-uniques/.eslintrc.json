@@ -21,7 +21,7 @@
       ],
       "parserOptions": {
         "project": [
-          "react-pallet-uniques/tsconfig.json"
+          "tsconfig.json"
         ]
       }
     }
