@@ -1,4 +1,3 @@
-
 import { useContext, createContext, useEffect, useState } from 'react';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
@@ -8,7 +7,7 @@ const connectedSocket = parsedQuery.get('rpc') || 'wss://westmint-rpc.polkadot.i
 
 interface ApiPromiseContextType {
   api?: ApiPromise;
-  chainName?: string; 
+  chainName?: string;
 }
 
 interface ApiRxContextProviderProps {
@@ -33,17 +32,17 @@ export function ApiContextProvider(
     if (apiPromise) return;
 
     console.log(`Connecting to: ${connectedSocket}`)
-
+    
+    const query = new URLSearchParams(window.location.search);
+    query.set('rpc', connectedSocket);
+    history.replaceState(null, "", "?" + query.toString());
+    
     const provider = new WsProvider(connectedSocket);
     const api = new ApiPromise({ provider });
 
     api.isReady
       .then(async () => {
         setApiPromise(api)
-
-        const query = new URLSearchParams(window.location.search);
-        query.set('rpc', connectedSocket);
-        history.replaceState(null, "", "?" + query.toString());
 
         const chain = await api.rpc.system.chain();
         setChainName(chain.toHuman());
