@@ -38,9 +38,7 @@ export function AccountProvider({ children }: ContextProviderProps): React.React
   }, []);
 
   return (
-    <AccountContext.Provider
-      value={{ accounts, selectAccount, selectedAccount }}
-    >
+    <AccountContext.Provider value={{ accounts, selectAccount, selectedAccount }}>
       {children}
     </AccountContext.Provider>
   );
