@@ -7,7 +7,7 @@ const TransferAssetForm = ({ handleSubmit }:DefaultFormProps) => {
 
   return (
     <Box width={{ max: "300px" }}>
-        <Heading level="3">4. Transfer asset</Heading>
+        <Heading level="3">5. Transfer asset</Heading>
         <Form
           value={value}
           onChange={nextValue => setValue(nextValue)}

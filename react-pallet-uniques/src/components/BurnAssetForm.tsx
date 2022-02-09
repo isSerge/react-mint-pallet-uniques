@@ -7,7 +7,7 @@ const BurnAssetForm = ({ handleSubmit }:DefaultFormProps) => {
 
   return (
     <Box width={{ max: "300px" }}>
-        <Heading level="3">4. Burn asset</Heading>
+        <Heading level="3">6. Burn asset</Heading>
         <Form
           value={value}
           onChange={nextValue => setValue(nextValue)}

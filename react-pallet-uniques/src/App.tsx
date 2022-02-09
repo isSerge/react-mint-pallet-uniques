@@ -10,6 +10,7 @@ import TransferAssetForm from './components/TransferAssetForm';
 import SetMetadataForm from './components/SetMetadataForm';
 import MintAssetForm from './components/MintAssetForm';
 import CreateClassForm from './components/CreateClassForm';
+import MintAssetWithMetadataForm from './components/MintAssetWithMetadataForm';
 import PalletInfo from './components/PalletInfo';
 
 function App() {
@@ -61,6 +62,19 @@ function App() {
       const extrinsic = api.tx.uniques.mint(parseInt(classId, 10), parseInt(assetId, 10), account.address);
       const injector = await web3FromSource(account.meta.source);
       const { block } = await sendAndFinalize(extrinsic, account.address, api, injector.signer);
+      console.log("Block: ", block);
+    }
+  }
+
+  const mintWithMetadata = async ({ classId, assetId, metadata, isFrozen }: Record<string, string | boolean>) => {
+    const account = accounts.find(({ meta }) => meta.name === selectedAccount);
+
+    if (account && api) {
+      const mint = api.tx.uniques.mint(parseInt(classId as string, 10), parseInt(assetId as string, 10), account.address);
+      const setMetadata = api.tx.uniques.setMetadata(parseInt(classId as string, 10), parseInt(assetId as string, 10), metadata, isFrozen);
+      const batch = api.tx.utility.batch([mint, setMetadata]);
+      const injector = await web3FromSource(account.meta.source);
+      const { block } = await sendAndFinalize(batch, account.address, api, injector.signer);
       console.log("Block: ", block);
     }
   }
@@ -135,6 +149,7 @@ function App() {
       <CreateClassForm handleSubmit={createClass} />
       <MintAssetForm handleSubmit={mint} />
       <SetMetadataForm handleSubmit={setAssetMetadata} />
+      <MintAssetWithMetadataForm handleSubmit={mintWithMetadata} />
       <TransferAssetForm handleSubmit={transfer} />
       <BurnAssetForm handleSubmit={burn} />
     </Box >
