@@ -12,6 +12,7 @@ import MintAssetForm from './components/MintAssetForm';
 import CreateClassForm from './components/CreateClassForm';
 import MintAssetWithMetadataForm from './components/MintAssetWithMetadataForm';
 import PalletInfo from './components/PalletInfo';
+import StoreAsset from './components/StoreAsset';
 
 function App() {
   const [classes, setClasses] = useState<{ id: number, value: AnyJson }[]>([]);
@@ -125,7 +126,7 @@ function App() {
 
   return (
     <Box>
-      <Box width="200px">
+      <Box>
         <Text>Chain: {chainName}</Text>
       </Box>
       <br />
@@ -146,6 +147,7 @@ function App() {
         selectedClass={selectedClass}
         selectedAsset={selectedAsset}
       />
+      <StoreAsset />
       <CreateClassForm handleSubmit={createClass} />
       <MintAssetForm handleSubmit={mint} />
       <SetMetadataForm handleSubmit={setAssetMetadata} />
