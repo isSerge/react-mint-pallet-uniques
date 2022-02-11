@@ -1,12 +1,13 @@
-
 import { useContext, createContext, useEffect, useState } from 'react';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { ApiOptions } from '@polkadot/api/types';
-// import { useChain } from './chainContext'
+
+const parsedQuery = new URLSearchParams(window.location.search);
+const connectedSocket = parsedQuery.get('rpc') || 'wss://westmint-rpc.polkadot.io';
 
 interface ApiPromiseContextType {
-  api: ApiPromise;
-  isApiReady: boolean;
+  api?: ApiPromise;
+  chainName?: string;
 }
 
 interface ApiRxContextProviderProps {
@@ -21,31 +22,36 @@ interface ApiContextProviderProps
 const ApiPromiseContext: React.Context<ApiPromiseContextType> =
   createContext({} as ApiPromiseContextType);
 
-export function ApiContextProvider(
+export function ApiProvider(
   { children }: ApiContextProviderProps
 ): React.ReactElement {
-  // TODO: use context to switch between networks
-  // const { selectedChain } = useChain();
-  // wss://westmint-rpc.polkadot.io westmint
-  // ws://127.0.0.1:9944 local
-  const [apiPromise] = useState<ApiPromise>(
-    new ApiPromise({ provider: new WsProvider('wss://westmint-rpc.polkadot.io') })
-  );
-
-  const [isReady, setIsReady] = useState(false);
+  const [apiPromise, setApiPromise] = useState<ApiPromise>();
+  const [chainName, setChainName] = useState<string>();
 
   useEffect(() => {
-    apiPromise.isReady
-      .then(() => {
-        setIsReady(true);
+    if (apiPromise) return;
+
+    console.log(`Connecting to: ${connectedSocket}`)
+    
+    const query = new URLSearchParams(window.location.search);
+    query.set('rpc', connectedSocket);
+    history.replaceState(null, "", "?" + query.toString());
+    
+    const provider = new WsProvider(connectedSocket);
+    const api = new ApiPromise({ provider });
+
+    api.isReady
+      .then(async () => {
+        setApiPromise(api)
+
+        const chain = await api.rpc.system.chain();
+        setChainName(chain.toHuman());
       })
       .catch((e) => console.error(e));
-  }, [apiPromise.isReady]);
+  }, [apiPromise]);
 
   return (
-    <ApiPromiseContext.Provider
-      value={{ api: apiPromise, isApiReady: isReady }}
-    >
+    <ApiPromiseContext.Provider value={{ api: apiPromise, chainName }}>
       {children}
     </ApiPromiseContext.Provider>
   );

@@ -8,6 +8,10 @@ interface IAccountContext {
   selectAccount: Dispatch<SetStateAction<string>>;
 }
 
+interface ContextProviderProps {
+  children?: React.ReactElement;
+}
+
 const AccountContext: Context<IAccountContext> =
   createContext({
     accounts: [],
@@ -15,7 +19,7 @@ const AccountContext: Context<IAccountContext> =
     selectAccount: () => null,
   } as IAccountContext);
 
-export function AccountContextProvider({ children }: any): React.ReactElement {
+export function AccountProvider({ children }: ContextProviderProps): React.ReactElement {
   const [accounts, setAccounts] = useState<InjectedAccountWithMeta[]>([]);
   const [selectedAccount, selectAccount] = useState<string>('');
 
@@ -34,9 +38,7 @@ export function AccountContextProvider({ children }: any): React.ReactElement {
   }, []);
 
   return (
-    <AccountContext.Provider
-      value={{ accounts, selectAccount, selectedAccount }}
-    >
+    <AccountContext.Provider value={{ accounts, selectAccount, selectedAccount }}>
       {children}
     </AccountContext.Provider>
   );

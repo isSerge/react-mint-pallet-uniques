@@ -1,8 +1,9 @@
 import { AddressOrPair, SubmittableExtrinsic } from "@polkadot/api/types";
-import { ISubmittableResult } from "@polkadot/types/types";
+import { ISubmittableResult, AnyTuple, Codec } from "@polkadot/types/types";
 import { CodecHash } from "@polkadot/types/interfaces";
 import { ApiPromise } from "@polkadot/api";
 import type { Signer } from '@polkadot/api/types';
+import type { StorageKey } from '@polkadot/types';
 
 export const sendAndFinalize = async (
   tx: SubmittableExtrinsic<"promise", ISubmittableResult>,
@@ -53,3 +54,13 @@ export const sendAndFinalize = async (
     );
   });
 };
+
+export function normalizeClass([key, value]: [StorageKey<AnyTuple>, Codec]) {
+  const id = parseInt((key.toHuman() as Array<string>)[0].replace(/,/g, ''), 10);
+  return { id, value: value.toJSON() }
+}
+
+export function normalizeAsset([key, value]: [StorageKey<AnyTuple>, Codec]) {
+  const id = parseInt((key.toHuman() as Array<string>)[1], 10);
+  return { id, value: value.toJSON() }
+}
