@@ -6,6 +6,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ApiProvider } from './apiContext';
 import { AccountProvider } from './accountContext';
+import { SubspaceProvider } from './subspaceContext';
 
 const theme = {
   global: {
@@ -23,7 +24,9 @@ ReactDOM.render(
       <Grommet theme={theme}>
         <AccountProvider>
           <ApiProvider>
-            <App />
+            <SubspaceProvider>
+              <App />
+            </SubspaceProvider>
           </ApiProvider>
         </AccountProvider>
       </Grommet>
