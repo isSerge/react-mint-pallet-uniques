@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Select, Text } from 'grommet';
+import { Box, Select, MenuItem, Typography } from '@mui/material';
 import type { AnyJson } from '@polkadot/types/types';
 import { web3FromSource } from '@polkadot/extension-dapp';
 import { useApi } from './apiContext';
@@ -125,18 +125,20 @@ function App() {
   }
 
   return (
-    <Box>
-      <Box>
-        <Text>Chain: {chainName}</Text>
+    <Box sx={{ padding: '20px' }}>
+      <Box mb={3}>
+        <Typography variant="h5">Chain: {chainName}</Typography>
       </Box>
-      <br />
-      <Box width="200px" gap="xxsmall">
-        <Text>Account</Text>
+      <Box mb={3}>
+        <Typography variant="h5">Account</Typography>
         <Select
-          options={accounts.map(({ meta }) => (meta.name as string))}
           value={selectedAccount}
-          onChange={({ option }) => selectAccount(option)}
-        />
+          onChange={(event) => selectAccount(event.target.value)}
+        >
+          {accounts.map(({ meta }) => (
+            <MenuItem key={meta.name as string} value={meta.name as string}>{meta.name as string}</MenuItem>
+          ))}
+        </Select>
       </Box>
       <PalletInfo
         classes={classes}

@@ -1,27 +1,24 @@
 import { useState } from 'react';
-import { Box, Heading, Form, FormField, TextInput, Button } from 'grommet';
+import { Typography, TextField, Button, Stack } from '@mui/material';
 import { DefaultFormProps } from '../types';
 
 const CreateClassForm = ({ handleSubmit }: DefaultFormProps) => {
-  const [classFormValue, setClassFormValue] = useState({ classId: '' });
+  const [value, setValue] = useState({ classId: '' });
+
+  const handleChange =
+    (prop: keyof Record<string, string>) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setValue({ ...value, [prop]: event.target.value });
+    };
+
   return (
-    <Box width={{ max: "300px" }}>
-        <Heading level="3">1. Create class</Heading>
-        <Form
-          value={classFormValue}
-          onChange={setClassFormValue}
-          onReset={() => setClassFormValue({ classId: '' })}
-          onSubmit={({ value }) => handleSubmit(value)}
-        >
-          <FormField name="Class ID" htmlFor="text-input-id" label="Class ID">
-            <TextInput name="classId" />
-          </FormField>
-          <Box direction="row" gap="medium">
-            <Button type="submit" primary label="Submit" />
-            <Button type="reset" label="Reset" />
-          </Box>
-        </Form>
-      </Box>
+    <Stack spacing={2} mb={3} alignItems="start">
+      <Typography variant="h5">1. Create class</Typography>
+      <TextField label="Class ID" value={value.classId} onChange={handleChange('classId')} />
+      <Stack spacing={2} direction="row">
+        <Button variant="contained" onClick={() => handleSubmit(value)}>Submit</Button>
+        <Button variant="outlined" onClick={() => setValue({ classId: '' })}>Reset</Button>
+      </Stack>
+    </Stack>
   )
 }
 

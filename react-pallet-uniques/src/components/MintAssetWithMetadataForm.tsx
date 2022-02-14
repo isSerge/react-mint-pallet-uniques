@@ -1,37 +1,35 @@
 import { useState } from 'react';
-import { Box, Heading, Form, FormField, TextInput, Button, CheckBox } from 'grommet';
+import { Typography, TextField, Button, Checkbox, Stack } from '@mui/material';
 import { DefaultFormProps } from '../types';
 
 const MintAssetWithMetadataForm = ({ handleSubmit }: DefaultFormProps) => {
   const [value, setValue] = useState<Record<string, string | boolean>>({ classId: '', assetId: '', metadata: '', isFrozen: false });
 
+  const handleChange =
+    (prop: keyof Record<string, string>) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setValue({ ...value, [prop]: event.target.value });
+    };
+
+  const toggleFrozen = () => {
+    setValue({ ...value, isFrozen: !value.isFrozen });
+  }
+
   return (
-    <Box width={{ max: "300px" }}>
-      <Heading level="3">4. Mint asset and set metadata (extrinsics batch)</Heading>
-      <Form
-        value={value}
-        onChange={nextValue => setValue(nextValue)}
-        onReset={() => setValue({ classId: '', assetId: '', metadata: '', isFrozen: false })}
-        onSubmit={({ value }) => handleSubmit(value)}
-      >
-        <FormField name="Class ID" htmlFor="text-input-id" label="Class ID">
-          <TextInput name="classId" />
-        </FormField>
-        <FormField name="Asset ID" htmlFor="text-input-id" label="Asset ID">
-          <TextInput name="assetId" />
-        </FormField>
-        <FormField name="Metadata" htmlFor="text-input-id" label="Metadata">
-          <TextInput name="metadata" />
-        </FormField>
-        <FormField name="Freeze" htmlFor="text-input-id">
-          <CheckBox name="isFrozen" label="Freeze" />
-        </FormField>
-        <Box direction="row" gap="medium">
-          <Button type="submit" primary label="Submit" />
-          <Button type="reset" label="Reset" />
-        </Box>
-      </Form>
-    </Box>
+    <Stack spacing={2} mb={3} alignItems="start">
+      <Typography variant="h5">4. Mint asset and set metadata (extrinsics batch)</Typography>
+      <TextField label="Class ID" value={value.classId} onChange={handleChange('classId')} />
+      <TextField label="Asset ID" value={value.assetId} onChange={handleChange('assetId')} />
+      <TextField label="Metadata" value={value.metadata} onChange={handleChange('metadata')} />
+      <Checkbox
+        checked={value.isFrozen as boolean}
+        onChange={toggleFrozen}
+        inputProps={{ 'aria-label': 'controlled' }}
+      />
+      <Stack spacing={2} direction="row">
+        <Button variant="contained" onClick={() => handleSubmit(value)}>Submit</Button>
+        <Button variant="outlined" onClick={() => setValue({ classId: '', assetId: '', metadata: '' })}>Reset</Button>
+      </Stack>
+    </Stack>
   )
 }
 

@@ -1,35 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import { Grommet } from 'grommet';
+import CssBaseline from '@mui/material/CssBaseline';
+
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ApiProvider } from './apiContext';
 import { AccountProvider } from './accountContext';
 import { SubspaceProvider } from './subspaceContext';
 
-const theme = {
-  global: {
-    font: {
-      family: 'Roboto',
-      size: '14px',
-      height: '20px',
-    },
-  },
-};
-
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Grommet theme={theme}>
-        <AccountProvider>
-          <ApiProvider>
-            <SubspaceProvider>
+      <AccountProvider>
+        <ApiProvider>
+          <SubspaceProvider>
+            <>
+              <CssBaseline />
               <App />
-            </SubspaceProvider>
-          </ApiProvider>
-        </AccountProvider>
-      </Grommet>
+            </>
+          </SubspaceProvider>
+        </ApiProvider>
+      </AccountProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
