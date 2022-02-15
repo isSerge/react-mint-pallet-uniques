@@ -1,9 +1,10 @@
-import { Box, Heading } from 'grommet';
+import { Box, Typography, Stack } from '@mui/material';
 import type { AnyJson } from '@polkadot/types/types';
+import { v4 } from 'uuid';
 
 interface PalletInfoProps {
-  classes: { id: number, value: AnyJson }[]; 
-  assets: { id: number, value: AnyJson }[]; 
+  classes: { id: number, value: AnyJson }[];
+  assets: { id: number, value: AnyJson }[];
   metadata: AnyJson | void;
   handleClassClick: (id: number) => void;
   handleAssetClick: (id: number) => void;
@@ -12,56 +13,60 @@ interface PalletInfoProps {
 }
 
 const PalletInfo = ({
-  classes, 
-  assets, 
-  metadata, 
-  handleClassClick, 
-  handleAssetClick, 
-  selectedClass, 
+  classes,
+  assets,
+  metadata,
+  handleClassClick,
+  handleAssetClick,
+  selectedClass,
   selectedAsset,
 }: PalletInfoProps) => (
-  <>
+  <Stack spacing={2} mb={3} alignItems="start">
     <Box>
-      <Heading level="3">Classes</Heading>
-      <Box>
+      <Typography variant="h5">Classes</Typography>
+      <Stack spacing={1}>
         {classes.map(({ id, value }: { id: number, value: AnyJson }) => {
           return (
             <Box
-              key={id}
+              key={v4()}
               onClick={() => handleClassClick(id)}
-              border={selectedClass === id && 'all'}
-              pad="xxsmall"
+              sx={{
+                border: selectedClass === id ? '1px solid' : 'none',
+                cursor: 'pointer',
+              }}
             >
               ID: {id} | owner: {(value as Record<string, unknown>).owner}
             </Box>
           )
         })}
-      </Box>
+      </Stack>
     </Box>
-    <Box>
-      <Heading level="3">Assets</Heading>
-      <Box>
+    <Box mb={3}>
+      <Typography variant="h5">Assets</Typography>
+      <Stack spacing={1}>
         {assets.map(({ id, value }: { id: number, value: AnyJson }) => {
           return (
             <Box
-              key={id}
+              key={v4()}
               onClick={() => handleAssetClick(id)}
-              border={selectedAsset === id && 'all'}
-              pad="xxsmall"
+              sx={{
+                border: selectedAsset === id ? '1px solid' : 'none',
+                cursor: 'pointer',
+              }}
             >
               ID: {id} | owner: {(value as Record<string, unknown>).owner}
             </Box>
           )
         })}
-      </Box>
+      </Stack>
     </Box>
-    <Box>
-      <Heading level="3">Metadata</Heading>
-      <Box overflow="scroll" pad="small" background="dark-2">
+    <Box mb={3}>
+      <Typography variant="h5">Metadata</Typography>
+      <Box>
         <pre>{metadata ? JSON.stringify(metadata, null, 2) : "select asset"}</pre>
       </Box>
     </Box>
-  </>
+  </Stack >
 )
 
 export default PalletInfo;
