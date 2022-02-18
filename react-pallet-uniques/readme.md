@@ -13,6 +13,7 @@ This app is built using following tools:
 REACT_APP_NODE_WS_PROVIDER=ws://localhost:9944
 REACT_APP_FARMER_WS_PROVIDER=ws://localhost:9955
 ```
+- `npm install` or `yarn` to install dependencies
 - `npm start` or `yarn start`
 for more scripts - please, refer to Create React App [docs](https://create-react-app.dev/)
 - Open `http://localhost:3000` in the browser
