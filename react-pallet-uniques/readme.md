@@ -13,8 +13,8 @@ This app is built using following tools:
 REACT_APP_NODE_WS_PROVIDER=ws://localhost:9944
 REACT_APP_FARMER_WS_PROVIDER=ws://localhost:9955
 ```
-- `npm start` or `yarn start`
-for more scripts - please, refer to Create React App [docs](https://create-react-app.dev/)
+- `npm ci` to install dependencies
+- `npm start` to start development (for more scripts - please, refer to Create React App [docs](https://create-react-app.dev/))
 - Open `http://localhost:3000` in the browser
 - App connects to Westmint node RPC endpoint by default, you can connect to any other Substrate-based chains by providing endpoint as `rpc` query parameter:
 ```
