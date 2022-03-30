@@ -23,4 +23,5 @@ http://localhost:3000/?rpc=wss%3A%2F%2Fwestmint-rpc.polkadot.io
 
 ## Notes
 - If you are connecting to local Substrate node,chain runtime should include [pallet-uniques](https://crates.parity.io/pallet_uniques/index.html)
+- If you are connecting to Statemint, Statemine or Westmint, you might need chain tokens to pay fees (DOT, KSM or WND). It is possible to get some WND tokens using Westend testnet [faucet](https://wiki.polkadot.network/docs/learn-DOT#getting-westies)
 - This app requires [Polkadot{.js} extension](https://polkadot.js.org/extension/) installed, as well as Subspace and target chain accounts with some funds to cover extrinsics fees
