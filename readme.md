@@ -1,4 +1,4 @@
-# Subspace examples
+# Subspace NFT examples
 
 ## What is this?
 This repository contains a collection of example apps to illustrate the use of Subspace network as a permanent storage for the NFT metadata
